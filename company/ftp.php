@@ -29,6 +29,12 @@ class Ftp {
                    'ftp_user_pass'=>'xiaodong',
                    'ftp_server_port'=>'21',
                ];
+    //    return [
+    //               'ftp_server'=>'124.243.193.31',
+    //               'ftp_user_name'=>'yndx',
+    //               'ftp_user_pass'=>'SB8F2uCI5lOvEbbQ',
+    //               'ftp_server_port'=>'33900',
+    //           ];
     }
 
     /**
@@ -92,7 +98,7 @@ class Ftp {
                 //判断是否为ts文件
                 if(strtolower($file_name_info[count($file_name_info)-1])=='ts')
                 {
-                    echo $path.'/'.$file_name.'<br>';
+                    echo $path.'/'.$file_name.'<br>'.PHP_EOL;
                     //存入数组
                     self::$content[$path.'/'.$file_name] = $path.'/'.$file_name;
                 }
