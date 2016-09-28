@@ -32,6 +32,14 @@ class Ftp {
     }
 
     /**
+     * [getContent 获取内容]
+     */
+    public function getContent()
+    {
+        return self::$content;
+    }
+
+    /**
      * [new_ftp_connect 连接ftp]
      * @param  [type] $config [description]
      */
@@ -87,14 +95,6 @@ class Ftp {
             }
         }
 
-    }
-
-    /**
-     * [getContent 获取内容]
-     */
-    public function getContent()
-    {
-        return self::$content;
     }
 }
 
