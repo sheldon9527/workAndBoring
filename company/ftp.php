@@ -39,6 +39,11 @@ class Ftp {
         return self::$content;
     }
 
+    public function getSystemType()
+    {
+        return ftp_systype(self::$ftp_link);
+    }
+
     /**
      * [new_ftp_connect 连接ftp]
      * @param  [type] $config [description]
@@ -112,4 +117,7 @@ $ftp->list_all_files($ftp->path);
 $res = $ftp->getContent();
 //输出
 echo "<pre>";var_dump($res);
+//ftp系统类型
+$system_type = $ftp->getSystemType();
+echo '<br>ftp系统类型:<font color="red">'.$system_type.'</front>';
 ?>
