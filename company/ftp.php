@@ -97,6 +97,10 @@ class Ftp {
             //判断是否为目录
             if($file_detail_info[0]{0}=='d')
             {
+                //判断是否为预告
+                if(strpos($file_detail_info[$length-1],'预告') !== false){
+                    continue;
+                }
                 //构建新的目录
                 $new_path =$path.'/'.$file_detail_info[$length-1];
                 //递归处理
