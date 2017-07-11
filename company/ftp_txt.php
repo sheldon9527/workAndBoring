@@ -49,7 +49,7 @@ class Ftp
     public static function list_all_files($path)
     {
         //目前下详细文件信息
-        $results = ftp_rawlist(self::$ftp_link, $path);
+        $results = ftp_rawlist(self::$ftp_link, $path, 9);
         //循环处理
         foreach ($results as $key => $result) {
             // result 例子“drwxrwxr-x 2 1000 1000 4096 Sep 25 04:14 Cron” 字符串转化成数组
@@ -65,7 +65,9 @@ class Ftp
                 //文件名称
                 $file_name =$file_detail_info[$length-1];
                 $file_name_info = explode('.', $file_name);
-                echo $path.'/'.$file_name;
+                $p = $path.'/'.$file_name;
+                echo $p;
+                echo "\r\n";
             }
         }
     }
@@ -74,19 +76,17 @@ class Ftp
 //实例化对象
 $ftp = new Ftp();
 $config =  [
-          'ftp_server'=>'ftp.4kgarden.com',
-          'ftp_user_name'=>'ftpread',
-          'ftp_user_pass'=>'ftpread123',
-          'ftp_server_port'=>'21',
+          'ftp_server'=>'124.243.193.31',
+          'ftp_user_name'=>'anhui',
+          'ftp_user_pass'=>'ZhuoYing',
+          'ftp_server_port'=>'33900',
       ];
 $ftp_list = $ftp->new_ftp_connect($config);
-echo $ftp_list;
-die;
 //未连接报错
 if ($ftp_list===false) {
     die('fail');
 }
 
 //调用方法
-$ftp->list_all_files('/data/video/OTT/8M');
+$ftp->list_all_files('/6月已提供/20170630/综艺');
 echo 'DONE';
