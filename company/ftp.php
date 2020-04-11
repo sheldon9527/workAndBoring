@@ -1,5 +1,6 @@
 <?php
-class Ftp {
+class Ftp
+{
 
     /**
      * [$ftp_link 定义连接]
@@ -21,26 +22,26 @@ class Ftp {
     {
         switch ($type) {
             case 'yndx':
-                $ftp_server ='172.25.20.151';
+                $ftp_server ='172.25.20.XXX';
                 $ftp_user_name ='hqhy0914';
                 $ftp_user_pass ='hqhy@)(14';
                 $ftp_server_port ='21';
                 break;
             case 'hqhy':
-                $ftp_server ='124.243.193.31';
+                $ftp_server ='124.243.XXX.XX';
                 $ftp_user_name ='yndx';
                 $ftp_user_pass ='SB8F2uCI5lOvEbbQ';
                 $ftp_server_port ='33900';
                 break;
             case 'sheldon':
-               $ftp_server='120.26.94.169';
-               $ftp_user_name='sheldon';
-               $ftp_user_pass='xiaodong';
-               $ftp_server_port='21';
-               break;
+                $ftp_server='120.26.XX.XXX';
+                $ftp_user_name='sheldon';
+                $ftp_user_pass='xiaodong';
+                $ftp_server_port='21';
+                break;
         }
 
-       return [
+        return [
                   'ftp_server'=>$ftp_server,
                   'ftp_user_name'=>$ftp_user_name,
                   'ftp_user_pass'=>$ftp_user_pass,
@@ -68,7 +69,7 @@ class Ftp {
     public static function new_ftp_connect($config)
     {
         extract($config);
-        $conn_id = ftp_connect($ftp_server,$ftp_server_port);
+        $conn_id = ftp_connect($ftp_server, $ftp_server_port);
         $login_result = ftp_login($conn_id, $ftp_user_name, $ftp_user_pass);
         ftp_pasv($conn_id, true);
 
@@ -85,42 +86,38 @@ class Ftp {
      * [list_all_files 获取内容]
      * @param  [type] $path [description]
      */
-    public  static function list_all_files($path)
+    public static function list_all_files($path)
     {
         //目前下详细文件信息
-        $results = ftp_rawlist(self::$ftp_link,$path);
+        $results = ftp_rawlist(self::$ftp_link, $path);
         //循环处理
         foreach ($results as $key => $result) {
             // result 例子“drwxrwxr-x 2 1000 1000 4096 Sep 25 04:14 Cron” 字符串转化成数组
             $file_detail_info = preg_split("/[\s]+/", $result);
             $length = count($file_detail_info);
             //判断是否为目录
-            if($file_detail_info[0]{0}=='d')
-            {
+            if ($file_detail_info[0]{0}=='d') {
                 //判断是否为预告
-                if(strpos($file_detail_info[$length-1],'预告') !== false){
+                if (strpos($file_detail_info[$length-1], '预告') !== false) {
                     continue;
                 }
                 //构建新的目录
                 $new_path =$path.'/'.$file_detail_info[$length-1];
                 //递归处理
                 self::list_all_files($new_path);
-
-            }else{
+            } else {
                 //文件名称
                 $file_name =$file_detail_info[$length-1];
-                $file_name_info = explode('.',$file_name);
+                $file_name_info = explode('.', $file_name);
                 //判断是否为ts文件
-                if(strtolower($file_name_info[count($file_name_info)-1])=='ts')
-                {
-                    $path = '/'.ltrim($path,'/');
+                if (strtolower($file_name_info[count($file_name_info)-1])=='ts') {
+                    $path = '/'.ltrim($path, '/');
                     echo $path.'/'.$file_name.'<br>'."\n";
                     //存入数组
                     self::$content[$path.'/'.$file_name] = $path.'/'.$file_name;
                 }
             }
         }
-
     }
 }
 
@@ -128,42 +125,39 @@ class Ftp {
  * 判断访问方式
  */
 if (isset($_SERVER['SHELL'])) {
-
     $argv_len = count($argv);
 
-    if($argv_len == 1){
+    if ($argv_len == 1) {
         fwrite(STDOUT, "请输入扫描ftp服务器类: 1.yndx 2.hqhy 3.sheldon\n");
 
         $type = trim(fgets(STDIN));
 
-        for ($i=0; $i <2 ; $i++) {
-            if(!in_array($type,['yndx','hqhy','sheldon'])){
+        for ($i=0; $i <2; $i++) {
+            if (!in_array($type, ['yndx','hqhy','sheldon'])) {
                 fwrite(STDOUT, "输入类型错误,请输入重新输入:");
                 $type = trim(fgets(STDIN));
             }
         }
 
-        if(!in_array($type,['yndx','hqhy','sheldon'])){
+        if (!in_array($type, ['yndx','hqhy','sheldon'])) {
             fwrite(STDOUT, "参数错误次数太多自动退出,重新执行脚本.");
             exit;
         }
-    }else {
+    } else {
         $type = $argv[1];
     }
 
 
     fwrite(STDOUT, "命令执行中.......\n");
-
-}else {
-
-    if(!array_key_exists('type',$_GET)){
+} else {
+    if (!array_key_exists('type', $_GET)) {
         echo "请输入参数?type 为yndx,sheldon,hqhy一个 例如:http://114.55.36.48:8088?type=hqhy";
         exit;
     }
 
     $type = $_GET['type'];
 
-    if(!in_array($type,['yndx','hqhy','sheldon'])){
+    if (!in_array($type, ['yndx','hqhy','sheldon'])) {
         echo "输入类型错误,请重新输入参数?type 为yndx,sheldon,hqhy一个";
         exit;
     }
@@ -177,8 +171,7 @@ $ftp = new Ftp();
 $config = $ftp->getConfig($type);
 $ftp_list = $ftp->new_ftp_connect($config);
 //未连接报错
-if($ftp_list===false)
-{
+if ($ftp_list===false) {
     die('fail');
 }
 
@@ -199,11 +192,11 @@ switch ($type) {
 $ftp->list_all_files($path);
 $res = $ftp->getContent();
 //输出
-echo "<pre>";var_dump($res);
+echo "<pre>";
+var_dump($res);
 //ftp系统类型
 $system_type = $ftp->getSystemType();
 
 echo '<br>ftp系统类型:'.$system_type;
 
 echo "\n<br>命令执行完毕\n";
-?>

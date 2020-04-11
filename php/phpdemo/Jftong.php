@@ -1,22 +1,22 @@
 <?php
 /**
  * 捷付通支付类
- * 
+ *
  * @author ZHW
- *        
+ *
  */
 class Jftong
 {
-    public static $retransferURL = "http://www.jftongtrans.com:18081/transfer/pretransfer";
-    public static $createsessionURL = "http://www.jftongtrans.com:18081/order/createsession";
-    public static $transorderURL = "http://www.jftongtrans.com:18081/order/transorder";
+    public static $retransferURL = "http://platform.dxxbcservice.com/transfer/pretransfer";
+    public static $createsessionURL = "http://platform.dxxbcservice.com/order/createsession";
+    public static $transorderURL = "http://platform.dxxbcservice.com/order/transorder";
 
     private $merno = '10000'; // 商户号
     private $appno = '10000'; // 应用编号
     private $privateKeyPath = './privatekey.pem'; // 私钥证书路径，需使用pkcs1格式证书
 
-    public function __construct(){
-
+    public function __construct()
+    {
     }
 
     /**
@@ -24,14 +24,15 @@ class Jftong
      * @data        表单内容
      * @gateway 支付网关地址
      */
-    public function buildForm($data) {
+    public function buildForm($data)
+    {
         $topayUrl = 'topay.php?qrcode='.urlencode($data['qrcodeUrl']).'&orderno='.$data['orderno'].'&title='.urlencode($data['title']).'&payment='.urlencode($data['payment']).'&amount='.$data['amount'];
-        header("location: {$topayUrl}"); 
+        header("location: {$topayUrl}");
     }
 
-
     // 创建支付接口下单
-    public function createpay($param){
+    public function createpay($param)
+    {
         $transdata = array(
             'merchantno' => $this->merno,
             'appno' => $this->appno,
@@ -41,44 +42,42 @@ class Jftong
             'itemno' => $param['orderno'], // 应用内订单号
             'itemname' => $param['productname'], // 商品名
             'customerno' => '1',
-            'notifyurl' => 'http://www.yoursite.com/paycallback.php' // 支付成功通知地址
+            'notifyurl' => 'http://www.yoursite.com/paycallback.php', // 支付成功通知地址
+            'paymode'   => '2'
         );
 
-        $resdata = $this->sendpost(self::$retransferURL,$transdata);
-        $transdata = json_decode($resdata['transdata'],TRUE);
+        $resdata = $this->sendpost(self::$retransferURL, $transdata);
+        $transdata = json_decode($resdata['transdata'], true);
         $serialno = $transdata['serialno'];
-
         $paytype = '';
         $paymentTitle = '';
-        // 支付方式 paytype：2 支付宝  , 
-        if($param['payment'] == 'ALIPAY'){
+        // 支付方式 paytype：2 支付宝  ,
+        if ($param['payment'] == 'ALIPAY') {
             $paytype = 2;
             $paymentTitle = '支付宝';
         }
-
         $transdata = array(
             'serialno' => $serialno
         );
-        $resdata = $this->sendpost(self::$createsessionURL,$transdata);
-        $transdata = json_decode($resdata['transdata'],TRUE);
+        $resdata = $this->sendpost(self::$createsessionURL, $transdata);
+        $transdata = json_decode($resdata['transdata'], true);
         $sessionid = $transdata['sessionid'];
-        if(!$sessionid){
+        if (!$sessionid) {
             echo 'sessionid 为空，不可下单';
             die();
         }
-
         $transdata = array(
             'sessionid' => $sessionid,
             'paytype' => $paytype
         );
-        $resdata = $this->sendpost(self::$transorderURL,$transdata);
-        $transdata = json_decode($resdata['transdata'],TRUE);
+        $resdata = $this->sendpost(self::$transorderURL, $transdata);
+        $transdata = json_decode($resdata['transdata'], true);
         $payparamCode = $transdata['resultinfo']['payparam'];
-        if(!$payparamCode){
+        if (!$payparamCode) {
             echo '支付接口二维码获取失败，请重试！';
             die();
         }
-        $payparam = json_decode(base64_decode($payparamCode),TRUE);
+        $payparam = json_decode(base64_decode($payparamCode), true);
         $qrcodeUrl = $payparam['url'];
 
         // 构建扫码页面参数
@@ -93,7 +92,8 @@ class Jftong
     }
 
     // 支付通知校验方法
-    public function notifycheck(&$result){
+    public function notifycheck(&$result)
+    {
         $data = file_get_contents('php://input');
 
         $resdata = $this->apiresolve($data);
@@ -102,19 +102,19 @@ class Jftong
 
         $_sign = $this->sign($transdataStr);
         $tradeResult = '';
-        if($transdataSign == $_sign){
-        	// 判断支付结果
-        	$transdata = json_decode($resdata['transdata'],TRUE);
-        	if($transdata['result'] == 2){
-        		// 支付结果成功
-        		$tradeResult = 'ok';
-        		$result = $transdata;
-        	}else{
-        		// 支付结果失败
-        		$tradeResult = 'pay result not success';
-        		$result = array();
-        	}
-        }else{
+        if ($transdataSign == $_sign) {
+            // 判断支付结果
+            $transdata = json_decode($resdata['transdata'], true);
+            if ($transdata['result'] == 2) {
+                // 支付结果成功
+                $tradeResult = 'ok';
+                $result = $transdata;
+            } else {
+                // 支付结果失败
+                $tradeResult = 'pay result not success';
+                $result = array();
+            }
+        } else {
             $tradeResult = 'sign error';
             $result = array();
         }
@@ -122,9 +122,11 @@ class Jftong
     }
 
 
-    private function sendpost($url,$transdata){ // 模拟提交数据函数
+    private function sendpost($url, $transdata)
+    {
+ // 模拟提交数据函数
 
-        $transdataStr = json_encode($transdata,JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $transdataStr = json_encode($transdata, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         $sign = urlencode($this->sign($transdataStr));
         $transdataStr = urlencode($transdataStr);
         $postdata = "transdata={$transdataStr}&sign={$sign}&signtype=RSA";
@@ -136,42 +138,39 @@ class Jftong
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2); // 从证书中检查SSL加密算法是否存在
         curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (compatible; MSIE 5.01; Windows NT 5.0)'); // 模拟用户使用的浏览器
         curl_setopt($curl, CURLOPT_COOKIE, '');
-        curl_setopt($curl, CURLOPT_REFERER,'');// 设置Referer
+        curl_setopt($curl, CURLOPT_REFERER, '');// 设置Referer
         curl_setopt($curl, CURLOPT_POST, 1); // 发送一个常规的Post请求
         curl_setopt($curl, CURLOPT_POSTFIELDS, $postdata); // Post提交的数据包
         curl_setopt($curl, CURLOPT_TIMEOUT, 13); // 设置超时限制防止死循环
         curl_setopt($curl, CURLOPT_HEADER, 0); // 显示返回的Header区域内容
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1); // 获取的信息以文件流的形式返回
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: text/plain'));
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json;charset=utf-8;'));
         $tmpInfo = curl_exec($curl); // 执行操作
         if (curl_errno($curl)) {
-           echo 'Errno'.curl_error($curl);//捕抓异常
+            echo 'Errno'.curl_error($curl);//捕抓异常
         }
         curl_close($curl); // 关闭CURL会话
         return $this->apiresolve($tmpInfo); // 返回数据
     }
 
-    private function sign($data='')
+    private function sign($data = '')
     {
-        if (empty($data))
-        {
-            return False;
+        if (empty($data)) {
+            return false;
         }
 
         // 私钥文件的路径
         $privateKeyPath = $this->privateKeyPath;
         $private_key = file_get_contents($privateKeyPath);
-        if (empty($private_key))
-        {
+        if (empty($private_key)) {
             echo "Private Key error!";
-            return False;
+            return false;
         }
 
         $pkeyid = openssl_get_privatekey($private_key);
-        if (empty($pkeyid))
-        {
+        if (empty($pkeyid)) {
             echo "private key resource identifier False!";
-            return False;
+            return false;
         }
 
         $verify = openssl_sign($data, $signature, $pkeyid, OPENSSL_ALGO_MD5);
@@ -180,14 +179,15 @@ class Jftong
     }
 
     // 接口返回数据解析
-    private function apiresolve($res){
-        if(strpos($res,'transdata') === FALSE){
+    private function apiresolve($res)
+    {
+        if (strpos($res, 'transdata') === false) {
             // 接口失败
             echo $res;
             die();
-        }else{
+        } else {
             // 接口成功
-            $resarray = explode('&',$res);
+            $resarray = explode('&', $res);
             $resdata = array();
             foreach ($resarray as $row) {
                 $a = explode('=', $row);
@@ -196,5 +196,4 @@ class Jftong
             return $resdata;
         }
     }
-
 }

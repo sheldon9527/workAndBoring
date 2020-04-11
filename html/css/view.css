@@ -1,0 +1,109 @@
+body{
+			margin: 0;
+			padding: 0;
+		}
+		.head{
+			height: 100px;
+		}
+		.head .head1{
+			width: 120px;
+			height: 100px;
+			margin-left: 100px;
+			float: left;
+		}
+		.head .head2{
+			width: 775px;
+			height: 100px;
+			float:left;
+			margin-left: 385px;
+		}
+		.head .head2  ul li{
+			list-style: none;
+		}
+		.head .head2 ul li a{
+			display: inline-block;
+			text-decoration: none;
+			line-height: 70px;
+			margin: 0 37px;
+			color: black;
+		}
+		.head .head2 ul li a:hover{
+			color: rgb(165,207,76);
+		}
+		.head .head3 ul li {
+			list-style: none;
+		}
+		.head .head3{
+			font-size: 15px; 
+			width:300px;
+			height: 100px;
+			float: right; 
+			position: relative;
+			margin-right: 10px;
+		}
+		.head .head3 ul li a {
+			color: black;
+			display: inline-block;
+			float:left;
+			text-decoration: none;
+			margin:0 13px;
+			line-height: 81px;
+		}
+		.box{
+			width: 1920px;
+			height: 344px;
+			background-color: black;
+			background-image: url(../image/psbMFHMK8KJ_副本.jpg);
+		}
+		.video{
+			margin-top: 20px;
+			width: 1920px;
+			height: 500px;
+			background-color: rgb(39,127,176);
+		}
+		.video-left{
+			margin-left: 48px;
+			margin-top:20px;
+			width: 400px;
+			height: 455px;
+			background-color: black;
+			float: left;
+			background-image: url(../image/56580a9669401b6359d0ac77_副本.jpg);
+		}
+		.video-mian{
+			margin-left: 20px;
+			margin-top:20px;
+			float: left;
+			width: 980px;
+			height: 455px;
+		}
+		.video-right{
+			margin-left: 20px;
+			margin-top:20px;
+			width: 400px;
+			height: 455px;
+			background-color: black;
+			float: left;
+			background-image: url(../image/55474af069401b1e833a03c3_副本.jpg);
+		}
+		.footer{
+			background-color: rgb(121115125);
+			color: #270402;
+			margin-top:10px;
+			width: 1980px;
+			height: 100px;
+			text-align: center;
+		}
+		.footer ul li{
+			color: #270402;
+			text-decoration: none;
+			list-style: none;
+		}
+
+		.footer ul li a{
+			color: #270402;
+			padding-top: 10px;
+			display: inline-block;
+			margin:0 20px;
+			text-decoration: none;
+		}
